@@ -34,7 +34,7 @@ public class MyWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter
     private String defaultFailureUrl;
 
     public MyWebSecurityConfigurerAdapter() {
-        System.out.println("init");
+        System.out.println("init 222");
     }
 
     protected void configure(HttpSecurity http) throws Exception {
