@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" th:src="@{/resources/js/jquery-3.2.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{/resources/js/customer/login.js}"></script>
+    <title>登录页面</title>
+</head>
+<body>
+<h1>登录页面。。。</h1>
+
+<hr>
+<h3>用户名密码登录</h3>
+<form name="f" action="/tw/login" method="POST">
+    <table>
+        <tbody>
+        <tr>
+            <td>User:</td>
+            <td><input type="text" name="username" value=""></td>
+        </tr>
+        <tr>
+            <td>Password:</td>
+            <td><input type="password" name="password"></td>
+        </tr>
+        <tr>
+            <td colspan="2"><input name="submit" type="submit" value="Login"></td>
+        </tr>
+        <input name="_csrf" type="hidden" th:value="${_csrf.token}">
+        </tbody>
+    </table>
+</form>
+<hr>
+<div th:switch="${errorStatus}">
+    　　<p th:case="1">登录失败，密码错误。</p>
+    　　<p th:case="2">登录失败，用户名不存在。</p>
+    <p th:case="3">登录失败，内部认证原因。</p>
+</div>
+<br>
+<hr>
+</body>
+</html>
