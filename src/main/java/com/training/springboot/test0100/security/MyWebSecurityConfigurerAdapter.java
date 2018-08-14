@@ -8,6 +8,7 @@ package com.training.springboot.test0100.security;
 import java.util.function.Function;
 
 import com.training.springboot.test0100.security.handler.MyAuthenticationFailureHandler;
+import com.training.springboot.test0100.security.service.DefaultUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -30,15 +31,29 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class MyWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationSuccessHandler myAuthenticationSuccessHandler;
+
+    @Autowired
+    private UserDetailsService defaultUserDetailsService;
+
     @Value("${spring.security.loginFailure.defaulturl}")
     private String defaultFailureUrl;
 
-    public MyWebSecurityConfigurerAdapter() {
-        System.out.println("init 222");
-    }
-
     protected void configure(HttpSecurity http) throws Exception {
-        ((HttpSecurity)((FormLoginConfigurer)((FormLoginConfigurer)((FormLoginConfigurer)((HttpSecurity)((AuthorizedUrl)((AuthorizedUrl)http.authorizeRequests().antMatchers(new String[]{"/login", "/logout", "/home"})).permitAll().anyRequest()).authenticated().and()).authenticationProvider(this.getAuthenticationProvider()).formLogin().loginPage("/login").defaultSuccessUrl("/home", true)).successHandler(this.myAuthenticationSuccessHandler)).failureHandler(this.getMyAuthenticationFailureHandler())).and()).logout().logoutSuccessUrl("/login");
+                http
+                    .authorizeRequests()
+                    .antMatchers(new String[]{"/login", "/logout", "/home"}).permitAll()
+                           .antMatchers(new String[]{"/testStu"}).access("hasRole('ADMIN')")
+                    .anyRequest()
+                    .authenticated()
+                    .accessDecisionManager(null)
+                .and()
+                    .authenticationProvider(this.getAuthenticationProvider())
+                    .formLogin().loginPage("/login")
+                    .defaultSuccessUrl("/home", true)
+                    .successHandler(this.myAuthenticationSuccessHandler)
+                    .failureHandler(this.getMyAuthenticationFailureHandler())
+                .and()
+                    .logout().logoutSuccessUrl("/login");
     }
 
     @Bean
@@ -52,7 +67,7 @@ public class MyWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter
     public AuthenticationProvider getAuthenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setHideUserNotFoundExceptions(false);
-        authenticationProvider.setUserDetailsService(this.myUserDeatilsServie());
+        authenticationProvider.setUserDetailsService(defaultUserDetailsService);
         authenticationProvider.setPasswordEncoder(this.passwordEncoder());
         return authenticationProvider;
     }
@@ -68,11 +83,13 @@ public class MyWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter
         return manager;
     }
 
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(new String[]{"/resources/**"});
     }
