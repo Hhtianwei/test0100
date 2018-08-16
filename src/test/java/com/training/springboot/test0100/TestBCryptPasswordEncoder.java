@@ -1,5 +1,6 @@
 package com.training.springboot.test0100;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Slf4j
 public class TestBCryptPasswordEncoder {
 
     @Autowired
@@ -28,6 +30,12 @@ public class TestBCryptPasswordEncoder {
         boolean flag = passwordEncoder.matches("1",str2);
         System.out.println("flag: " + flag);
 
+    }
+
+    @Test
+    public void logtest() throws InterruptedException {
+        log.info("thread test.............");
+        log.error("测试日志。。。aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     }
 
 }

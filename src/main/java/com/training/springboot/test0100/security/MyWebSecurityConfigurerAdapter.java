@@ -7,12 +7,14 @@ package com.training.springboot.test0100.security;
 
 import java.util.function.Function;
 
+import com.training.springboot.test0100.security.accessmanager.DefaultAccessDecisionManager;
 import com.training.springboot.test0100.security.handler.MyAuthenticationFailureHandler;
 import com.training.springboot.test0100.security.service.DefaultUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,11 +43,11 @@ public class MyWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter
     protected void configure(HttpSecurity http) throws Exception {
                 http
                     .authorizeRequests()
-                    .antMatchers(new String[]{"/login", "/logout", "/home"}).permitAll()
-                           .antMatchers(new String[]{"/testStu"}).access("hasRole('ADMIN')")
+                    .antMatchers(new String[]{"/login", "/logout", "/home","/"}).permitAll()
+                       //    .antMatchers(new String[]{"/testStu"}).access("hasRole('ADMIN')")
                     .anyRequest()
                     .authenticated()
-                    .accessDecisionManager(null)
+                    .accessDecisionManager(getDefaultAccessDecisionManager())
                 .and()
                     .authenticationProvider(this.getAuthenticationProvider())
                     .formLogin().loginPage("/login")
@@ -54,6 +56,11 @@ public class MyWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter
                     .failureHandler(this.getMyAuthenticationFailureHandler())
                 .and()
                     .logout().logoutSuccessUrl("/login");
+    }
+
+    @Bean
+    public AccessDecisionManager getDefaultAccessDecisionManager(){
+        return new DefaultAccessDecisionManager();
     }
 
     @Bean

@@ -51,24 +51,44 @@ public class DefaultUserDetailsService implements UserDetailsService {
 
         User user = users.get(0);
 
+        //List<GrantedAuthority> roleList = this.loadUserARoles(userName);
+//        if (roleList == null || roleList.size() == 0) {
+//            throw new UsernameNotFoundException(String.format("User %s has no GrantedAuthority",userName));
+//        }
+//
+//        Set<GrantedAuthority> roles = new HashSet<>();
+//        roles.addAll(roleList);
+//        List<GrantedAuthority> resultRoles = new ArrayList<>();
+//        resultRoles.addAll(roles);
+
         List<GrantedAuthority> roleList = this.loadUserAuthorities(userName);
         if (roleList == null || roleList.size() == 0) {
             throw new UsernameNotFoundException(String.format("User %s has no GrantedAuthority",userName));
         }
 
-        Set<GrantedAuthority> roles = new HashSet<>();
-        roles.addAll(roleList);
+        Set<GrantedAuthority> resources = new HashSet<>();
+        resources.addAll(roleList);
         List<GrantedAuthority> resultRoles = new ArrayList<>();
-        resultRoles.addAll(roles);
+        resultRoles.addAll(resources);
 
-        return new User(user.getUsername(),user.getPassword(),user.isEnabled(),true,true,true,roles);
+        return new User(user.getUsername(),user.getPassword(),user.isEnabled(),true,true,true,resources);
     }
 
-    protected List<GrantedAuthority> loadUserAuthorities(String userName) {
+    protected List<GrantedAuthority> loadUserARoles(String userName) {
         String authoritiesByUsernameQuery = "SELECT R.role FROM USERS U  LEFT JOIN user_role UR ON UR.userId = U.id LEFT JOIN ROLES R ON UR.roleId = R.ID WHERE U.username = ?";
         return jdbcTemplate.query(authoritiesByUsernameQuery, new String[]{userName}, new RowMapper<GrantedAuthority>() {
             public GrantedAuthority mapRow(ResultSet rs, int rowNum) throws SQLException {
                 String roleName = "ROLE_" + rs.getString("role");
+                return new SimpleGrantedAuthority(roleName);
+            }
+        });
+    }
+
+    protected List<GrantedAuthority> loadUserAuthorities(String userName) {
+        String authoritiesByUsernameQuery = "SELECT a.authority FROM users u  LEFT JOIN user_role ur ON ur.userId = u.id LEFT JOIN roles r ON r.id = ur.roleId LEFT JOIN role_authorities ra ON ra.roleId = r.id LEFT JOIN authorities a ON a.id = ra.authorityId WHERE u.username = ?";
+        return jdbcTemplate.query(authoritiesByUsernameQuery, new String[]{userName}, new RowMapper<GrantedAuthority>() {
+            public GrantedAuthority mapRow(ResultSet rs, int rowNum) throws SQLException {
+                String roleName = rs.getString("authority");
                 return new SimpleGrantedAuthority(roleName);
             }
         });
