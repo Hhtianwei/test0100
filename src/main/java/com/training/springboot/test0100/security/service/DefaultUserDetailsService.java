@@ -61,7 +61,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
         List<GrantedAuthority> resultRoles = new ArrayList<>();
         resultRoles.addAll(roles);
 
-        return new User(user.getUsername(),user.getPassword(),user.isEnabled(),true,true,true,roles);
+        return new User(user.getUsername(),user.getPassword(),user.isEnabled(),true,true,true,resultRoles);
     }
 
     protected List<GrantedAuthority> loadUserAuthorities(String userName) {

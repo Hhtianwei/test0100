@@ -37,4 +37,11 @@ public class HelloController {
         Optional<StudentModel> optional = this.studentRepository.findById(21L);
         return (StudentModel)optional.get();
     }
+
+    @GetMapping({"/testAAA"})
+    @JsonView({StudentModel.DetailView.class})
+    public StudentModel getStuById4Test() {
+        Optional<StudentModel> optional = this.studentRepository.findById(21L);
+        return (StudentModel)optional.get();
+    }
 }

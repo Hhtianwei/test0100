@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,8 +27,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 @Configuration
+@Component
 public class MyWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationSuccessHandler myAuthenticationSuccessHandler;
@@ -39,13 +42,14 @@ public class MyWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter
     private String defaultFailureUrl;
 
     protected void configure(HttpSecurity http) throws Exception {
-                http
+                http.csrf().disable()
                     .authorizeRequests()
+                    .antMatchers("/auth/**").permitAll()
                     .antMatchers(new String[]{"/login", "/logout", "/home"}).permitAll()
                            .antMatchers(new String[]{"/testStu"}).access("hasRole('ADMIN')")
-                    .anyRequest()
+                        .antMatchers(new String[]{"/testAAA"}).access("hasRole('USER')")
+                        .anyRequest()
                     .authenticated()
-                    .accessDecisionManager(null)
                 .and()
                     .authenticationProvider(this.getAuthenticationProvider())
                     .formLogin().loginPage("/login")
@@ -54,6 +58,7 @@ public class MyWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter
                     .failureHandler(this.getMyAuthenticationFailureHandler())
                 .and()
                     .logout().logoutSuccessUrl("/login");
+
     }
 
     @Bean
